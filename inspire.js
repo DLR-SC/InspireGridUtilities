@@ -145,3 +145,58 @@ export function generateGridCellIdentifier(position, resolution) {
     let unit = cellSizeMeters[resolution].unit, value = cellSizeMeters[resolution].value
     return `Grid_ETRS89-GRS80_z${factor}_${value}${unit}_${cellLat >= 0 ? 'N' : 'S'}${Math.round(degreesToUnit(Math.abs(cellLat), unit, value))}_${cellLong >= 0 ? 'E' : 'W'}${Math.round(degreesToUnit(Math.abs(cellLong), unit, value))}`;
 }
+
+function unitToDegrees(minutes, unit, multiple) {
+    if (unit === 'D') {
+      return minutes;
+    } else if (unit === 'M') {
+      return (minutes / 60 * multiple);
+    } else if (unit === 'S') {
+      return (minutes / 3600 * multiple);
+    } else if (unit === 'MS') {
+      return (minutes / 3600000 * multiple);
+    } else if (unit === 'MMS') {
+      return (minutes / 3600000000 * multiple);
+    } else {
+      return null; 
+    }
+  }
+  
+  
+  /**
+   * Extracts bounds of grid from the identifier.
+   *
+   * @param {string} cellIdentifier - The grid cell identifier to parse.
+   * @returns {Array<Array<number>>|null} The coordinate positions as [[minLat, minLong], [maxLat, maxLong]], or null if parsing fails.
+   */
+  function extractPositionsFromCellIdentifier(cellIdentifier) {
+    const regex = /^Grid_ETRS89-GRS80_z(\d+)_(\d+[A-Z]+)_(N|S)(\d+\.*\d*)_(E|W)(\d+\.*\d*)$/;
+    const match = cellIdentifier.match(regex);
+  
+    if (match) {
+      const [, factor, resStr, latDirection, latValue, longDirection, longValue] = match;
+  
+      const unit =  resStr.match(/\D+/)[0];
+      const value = parseInt(resStr);
+  
+      const minLat = unitToDegrees(latValue, unit, value) * (latDirection === 'N' ? 1 : -1);
+      const minLong = unitToDegrees(parseFloat(longValue), unit, value) * (longDirection === 'E' ? 1 : -1);
+  
+      let resolution = null;
+  
+      for (const key in cellSizeMeters) {
+        if ((cellSizeMeters[key].value + cellSizeMeters[key].unit) === resStr) {
+          resolution = key;
+          break;
+        }
+      }
+      const latIncrement = latitudeSpacing[resolution] / 3600;
+      const maxLat = minLat + latIncrement
+      const maxLong = minLong + latIncrement * parseInt(factor)
+  
+      
+      return [[minLat, minLong], [maxLat, maxLong]];
+    }
+  
+    return null;
+}
