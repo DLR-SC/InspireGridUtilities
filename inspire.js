@@ -200,3 +200,38 @@ function unitToDegrees(minutes, unit, multiple) {
   
     return null;
 }
+
+/**
+ * Determines the grid cell that contains the given geographic position.
+ *
+ * @param {Array<number>} position - The geographic position as [latitude, longitude].
+ * @param {number} resolution - The resolution of the grid.
+ * @returns {Array<number>} The boundaries of the grid cell as [minLong, minLat, maxLong, maxLat].
+ */
+function getGridCellBoundaries(position, resolution) {
+    const [pointLat, pointLong] = position;
+    let [minLat, minLong] = etrs89Bounds[0];
+  
+    
+    for (let lat = geoBounds[0][0]; lat <= geoBounds[1][0]; lat += latitudeSpacing[resolution] / 3600) {
+      if (lat > pointLat) {
+        minLat = lat - latitudeSpacing[resolution] / 3600;
+        break;
+      }
+    }
+  
+    const factor = getLongitudinalFactor(minLat, resolution);
+  
+    for (let long = geoBounds[0][1]; long <= geoBounds[1][1]; long += factor*latitudeSpacing[resolution] / 3600) {
+      if (long > pointLong) {
+        minLong = long - factor*latitudeSpacing[resolution] / 3600;
+        break;
+      }
+    }
+  
+    const latIncrement = latitudeSpacing[resolution] / 3600;
+    const maxLat = minLat + latIncrement;
+    const maxLong = minLong + latIncrement * parseInt(factor);
+  
+    return [[minLat, minLong], [maxLat, maxLong]];
+}
