@@ -101,18 +101,18 @@ function range(start, stop, step) {
 }
 
 function degreesToUnit(value, unit, multiple) {
-    if (unit === 'D') {
-      return (value);
-    } else if (unit === 'M') {
-      return (value * 60 / multiple);
-    } else if (unit === 'S') {
-      return (value * 3600 / multiple);
-    } else if (unit === 'MS') {
-      return (value * 3600000 / multiple);
-    } else if (unit === 'MMS') {
-      return (value * 3600000000 / multiple);
+    const unitMultipliers = {
+      'D': 1,
+      'M': 60,
+      'S': 3600,
+      'MS': 3600000,
+      'MMS': 3600000000
+    };
+  
+    if (unit in unitMultipliers) {
+      return (value * unitMultipliers[unit] / multiple);
     } else {
-      return null; 
+      return null;
     }
 }
 
@@ -147,20 +147,20 @@ export function generateGridCellIdentifier(position, resolution) {
 }
 
 function unitToDegrees(minutes, unit, multiple) {
-    if (unit === 'D') {
-      return minutes;
-    } else if (unit === 'M') {
-      return (minutes / 60 * multiple);
-    } else if (unit === 'S') {
-      return (minutes / 3600 * multiple);
-    } else if (unit === 'MS') {
-      return (minutes / 3600000 * multiple);
-    } else if (unit === 'MMS') {
-      return (minutes / 3600000000 * multiple);
+    const unitMultipliers = {
+      'D': 1,
+      'M': 1 / 60,
+      'S': 1 / 3600,
+      'MS': 1 / 3600000,
+      'MMS': 1 / 3600000000
+    };
+  
+    if (unit in unitMultipliers) {
+      return (minutes * unitMultipliers[unit] * multiple);
     } else {
-      return null; 
+      return null;
     }
-  }
+}
   
   
   /**
@@ -169,7 +169,7 @@ function unitToDegrees(minutes, unit, multiple) {
    * @param {string} cellIdentifier - The grid cell identifier to parse.
    * @returns {Array<Array<number>>|null} The coordinate positions as [[minLat, minLong], [maxLat, maxLong]], or null if parsing fails.
    */
-  function extractPositionsFromCellIdentifier(cellIdentifier) {
+export function extractPositionsFromCellIdentifier(cellIdentifier) {
     const regex = /^Grid_ETRS89-GRS80_z(\d+)_(\d+[A-Z]+)_(N|S)(\d+\.*\d*)_(E|W)(\d+\.*\d*)$/;
     const match = cellIdentifier.match(regex);
   
@@ -208,7 +208,7 @@ function unitToDegrees(minutes, unit, multiple) {
  * @param {number} resolution - The resolution of the grid.
  * @returns {Array<number>} The boundaries of the grid cell as [minLong, minLat, maxLong, maxLat].
  */
-function getGridCellBoundaries(position, resolution) {
+export function getGridCellBoundaries(position, resolution) {
     const [pointLat, pointLong] = position;
     let [minLat, minLong] = etrs89Bounds[0];
   
