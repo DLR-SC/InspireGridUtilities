@@ -1,0 +1,32 @@
+{
+  "name": "inspire-grid-utilities",
+  "version": "0.1.0",
+  "author": "German Aerospace Center (DLR)",
+  "license": "Apache-2.0",
+  "repository": {
+    "url": "https://github.com/DLR-SC/InspireGridUtilities/tree/main"
+  },
+  "scripts": {
+    "build": "microbundle build",
+    "watch": "microbundle watch",
+    "format": "prettier --write ./src",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "source": "src/inspire.ts",
+  "module": "dist/inspire-grid-utilities.modern.js",
+  "unpkg": "dist/inspire-grid-utilities.umd.js",
+  "amdName": "InspireGridUtilities",
+  "type": "module",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "jest": "^29.6.4",
+    "jest-matcher-deep-close-to": "^3.0.2",
+    "ts-jest": "^29.1.1",
+    "@jest/globals": "^29.6.4",
+    "microbundle": "^0.13.0",
+    "prettier": "^2.8.4",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.9.5"
+  }
+}
